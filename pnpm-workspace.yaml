@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 overrides:
-  hono: 4.12.25
+  "hono": "4.12.25"
 
 allowBuilds:
   '@nestjs/core': true
