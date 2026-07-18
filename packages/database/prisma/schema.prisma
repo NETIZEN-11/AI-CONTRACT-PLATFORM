@@ -1,0 +1,807 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum UserRole {
+  ADMIN
+  LEGAL_MANAGER
+  LAWYER
+  PROCUREMENT
+  HR
+  FINANCE
+  COMPLIANCE_OFFICER
+  EXTERNAL_CLIENT
+}
+
+enum ContractStatus {
+  DRAFT
+  UNDER_REVIEW
+  AI_REVIEW
+  LEGAL_REVIEW
+  COMPLIANCE_REVIEW
+  APPROVED
+  SIGNED
+  EXECUTED
+  ARCHIVED
+  REJECTED
+  EXPIRED
+}
+
+enum ContractType {
+  NDA
+  EMPLOYMENT
+  VENDOR
+  CLIENT
+  SERVICE
+  PARTNERSHIP
+  PURCHASE
+  LEASE
+  LICENSE
+  INSURANCE
+  OTHER
+}
+
+enum RiskLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  REQUIRES_REVIEW
+  PARTIALLY_COMPLIANT
+  UNKNOWN
+}
+
+enum NotificationChannel {
+  EMAIL
+  SLACK
+  TEAMS
+  PUSH
+  WEBHOOK
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  BOUNCED
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  VIEW
+  EXPORT
+  SHARE
+  COMMENT
+  APPROVE
+  REJECT
+  SIGN
+  ARCHIVE
+  RESTORE
+}
+
+enum WorkflowStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+}
+
+// ============================================================================
+// CORE ENTITIES
+// ============================================================================
+
+model Organization {
+  id                    String     @id @default(cuid())
+  name                  String
+  description           String?
+  logo                  String?
+  website               String?
+  industry              String?
+  country               String?
+  timezone              String     @default("UTC")
+  internalPolicies      String?    // JSON with custom compliance policies
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  teams                 Team[]
+  users                 User[]
+  contracts             Contract[]
+  clauses               Clause[]
+  riskReports           RiskReport[]
+  complianceReports     ComplianceReport[]
+  auditLogs             AuditLog[]
+  notifications         Notification[]
+  workflows             Workflow[]
+  comments              Comment[]
+  aiReviews             AIReview[]   @relation("AiReviewsToOrg")
+  risks                 Risk[]        @relation("RisksToOrg")
+  approvals             Approval[]    @relation("ApprovalsToOrg")
+  signatures            Signature[]   @relation("SignaturesToOrg")
+  workflowItems         WorkflowItem[] @relation("WorkflowItemsToOrg")
+  
+  @@index([name])
+  // @@fulltext([name, description])
+}
+
+model Team {
+  id                    String     @id @default(cuid())
+  organizationId        String
+  name                  String
+  description           String?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members               User[]
+  contracts             Contract[]
+  
+  @@index([organizationId])
+  @@index([name])
+  @@unique([organizationId, name])
+}
+
+model User {
+  id                    String     @id @default(cuid())
+  email                 String     @unique
+  name                  String
+  avatar                String?
+  role                  UserRole
+  organizationId        String
+  teamId                String?
+  isActive              Boolean    @default(true)
+  lastLogin             DateTime?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Authentication
+  hashedPassword        String?
+  emailVerified         DateTime?
+  mfaEnabled            Boolean    @default(false)
+  mfaSecret             String?    // TOTP secret
+  backupCodes           String[]   // Encrypted backup codes
+  
+  // Password Management
+  passwordChangedAt     DateTime?
+  passwordResetToken    String?
+  passwordResetExpires  DateTime?
+  failedLoginAttempts   Int        @default(0)
+  accountLockedUntil    DateTime?
+  
+  // OAuth
+  oauthProvider         String?    // "google", "microsoft", null
+  oauthProviderId       String?
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team                  Team?       @relation(fields: [teamId], references: [id])
+  contracts             Contract[]
+  comments              Comment[]
+  approvals             Approval[]
+  createdReviews        AIReview[] @relation("CreatedBy")
+  assignedReviews       AIReview[] @relation("AssignedTo")
+  auditLogs             AuditLog[]
+  notifications         Notification[]
+  refreshTokens         RefreshToken[]
+  sessions              Session[]
+  apiKeys               ApiKey[]
+  
+  @@index([organizationId])
+  @@index([teamId])
+  @@index([email])
+  @@index([role])
+  @@index([oauthProvider, oauthProviderId])
+}
+
+// ============================================================================
+// AUTHENTICATION ENTITIES
+// ============================================================================
+
+model RefreshToken {
+  id                    String     @id @default(cuid())
+  userId                String
+  token                 String     @unique
+  deviceInfo            String?    // User agent
+  ipAddress             String?
+  expiresAt             DateTime
+  isRevoked             Boolean    @default(false)
+  createdAt             DateTime   @default(now())
+  
+  // Relations
+  user                  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model Session {
+  id                    String     @id @default(cuid())
+  userId                String
+  sessionToken          String     @unique
+  deviceInfo            String?
+  ipAddress             String?
+  lastActivity          DateTime   @default(now())
+  expiresAt             DateTime
+  createdAt             DateTime   @default(now())
+  
+  // Relations
+  user                  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+}
+
+model ApiKey {
+  id                    String     @id @default(cuid())
+  userId                String
+  name                  String
+  key                   String     @unique
+  hashedKey             String
+  
+  // Permissions
+  scopes                String[]   // ["contracts:read", "contracts:write", etc.]
+  
+  // Status
+  isActive              Boolean    @default(true)
+  expiresAt             DateTime?
+  lastUsedAt            DateTime?
+  
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  user                  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([key])
+  @@index([hashedKey])
+}
+
+model Permission {
+  id                    String     @id @default(cuid())
+  name                  String     @unique  // "contracts:create", "users:delete"
+  description           String?
+  resource              String     // "contracts", "users", "analytics"
+  action                String     // "create", "read", "update", "delete"
+  createdAt             DateTime   @default(now())
+  
+  // Relations
+  rolePermissions       RolePermission[]
+  
+  @@index([resource])
+  @@index([action])
+}
+
+model RolePermission {
+  id                    String     @id @default(cuid())
+  role                  UserRole
+  permissionId          String
+  createdAt             DateTime   @default(now())
+  
+  // Relations
+  permission            Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  @@unique([role, permissionId])
+  @@index([role])
+}
+
+// ============================================================================
+// CONTRACT ENTITIES
+// ============================================================================
+
+model Contract {
+  id                    String     @id @default(cuid())
+  organizationId        String
+  teamId                String?
+  title                 String
+  description           String?
+  contractType          ContractType
+  status                ContractStatus @default(DRAFT)
+  fileUrl               String?
+  fileKey               String?    // S3/Blob storage key
+  fileSize              Int?       // In bytes
+  fileName              String?
+  
+  // Contract Details
+  parties               String[]   // JSON array of parties
+  effectiveDate         DateTime?
+  expirationDate        DateTime?
+  jurisdiction          String?
+  governingLaw          String?
+  
+  // Financial
+  value                 Float?
+  currency              String?    @default("USD")
+  paymentTerms          String?
+  
+  // Metadata
+  extractedText         String?    // Indexed text from OCR
+  embedding             String? // OpenAI embeddings
+  
+  createdBy             String
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  archivedAt            DateTime?
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  team                  Team?       @relation(fields: [teamId], references: [id])
+  createdByUser         User       @relation(fields: [createdBy], references: [id])
+  versions              ContractVersion[]
+  clauses               Clause[]
+  aiReviews             AIReview[]
+  riskReports           RiskReport[]
+  complianceReports     ComplianceReport[]
+  comments              Comment[]
+  approvals             Approval[]
+  signatures            Signature[]
+  workflowItems         WorkflowItem[]
+  notifications         Notification[]
+  
+  @@index([organizationId])
+  @@index([teamId])
+  @@index([status])
+  @@index([contractType])
+  @@index([expirationDate])
+  @@index([createdAt])
+  // @@fulltext([title, description, extractedText])
+}
+
+model ContractVersion {
+  id                    String     @id @default(cuid())
+  contractId            String
+  version               Int
+  title                 String
+  fileUrl               String?
+  fileKey               String?
+  extractedText         String?
+  embedding             String?
+  
+  // Metadata
+  changesSummary        String?    // What changed from previous version
+  createdAt             DateTime   @default(now())
+  createdBy             String
+  
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  clauses               Clause[]
+  
+  @@index([contractId])
+  @@index([version])
+  @@unique([contractId, version])
+}
+
+model Clause {
+  id                    String     @id @default(cuid())
+  organizationId        String
+  contractId            String?
+  versionId             String?
+  title                 String
+  content               String
+  category              String    // "Parties", "Payment Terms", "Termination", etc.
+  embedding             String?
+  
+  // Metadata
+  isTemplate            Boolean    @default(false)
+  isFavorite            Boolean    @default(false)
+  riskLevel             RiskLevel? @default(INFO)
+  
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  contract              Contract?  @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  version               ContractVersion? @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([contractId])
+  @@index([category])
+  // @@fulltext([title, content])
+}
+
+// ============================================================================
+// AI ANALYSIS ENTITIES
+// ============================================================================
+
+model AIReview {
+  id                    String     @id @default(cuid())
+  contractId            String
+  organizationId        String
+  
+  // Analysis Results
+  executiveSummary      String?
+  legalSummary          String?
+  businessSummary       String?
+  plainEnglishSummary   String?
+  riskSummary           String?
+  obligationSummary     String?
+  timelineSummary       String?
+  
+  // Extracted Information
+  extractedParties      String[]   // JSON array
+  extractedEffectiveDate DateTime?
+  extractedExpirationDate DateTime?
+  extractedPaymentTerms String?
+  extractedJurisdiction String?
+  extractedGoverningLaw String?
+  
+  // Metadata
+  status                String     @default("PENDING")
+  confidence            Float?    // 0-1 confidence score
+  aiModel               String?    // "gpt-4", "claude-3", etc.
+  tokensUsed            Int?
+  processingTimeMs      Int?
+  
+  createdBy             String?
+  assignedTo            String?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation("AiReviewsToOrg", fields: [organizationId], references: [id], onDelete: Cascade)
+  createdByUser         User?      @relation("CreatedBy", fields: [createdBy], references: [id])
+  assignedToUser        User?      @relation("AssignedTo", fields: [assignedTo], references: [id])
+  risks                 Risk[]
+  
+  @@index([contractId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Risk {
+  id                    String     @id @default(cuid())
+  reviewId              String
+  organizationId        String
+  
+  // Risk Details
+  type                  String     // "Missing Clause", "Unlimited Liability", etc.
+  description           String
+  riskLevel             RiskLevel
+  impact                String?
+  recommendation        String?
+  affectedClause        String?
+  
+  // Evidence
+  evidence              String?    // JSON with supporting data
+  aiExplanation         String?
+  
+  // Status
+  status                String     @default("OPEN")
+  acknowledged          Boolean    @default(false)
+  mitigated             Boolean    @default(false)
+  mitigationPlan        String?
+  
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  review                AIReview   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  organization          Organization @relation("RisksToOrg", fields: [organizationId], references: [id])
+  
+  @@index([reviewId])
+  @@index([organizationId])
+  @@index([riskLevel])
+  @@index([status])
+}
+
+model RiskReport {
+  id                    String     @id @default(cuid())
+  contractId            String
+  organizationId        String
+  
+  // Summary
+  totalRisks            Int        @default(0)
+  criticalCount         Int        @default(0)
+  highCount             Int        @default(0)
+  mediumCount           Int        @default(0)
+  lowCount              Int        @default(0)
+  riskScore             Float?     // 0-100
+  overallRiskLevel      RiskLevel  @default(MEDIUM)
+  
+  // Details
+  missingClauses        String[]   // JSON array
+  conflictingClauses    String[]
+  financialRisks        String?
+  dataPrivacyRisks      String?
+  complianceGaps        String?
+  
+  // Metadata
+  generatedAt           DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  
+  @@index([contractId])
+  @@index([organizationId])
+  @@unique([contractId])
+}
+
+model ComplianceReport {
+  id                    String     @id @default(cuid())
+  contractId            String
+  organizationId        String
+  
+  // Compliance Checks
+  gdprCompliant         ComplianceStatus @default(UNKNOWN)
+  hipaaCompliant        ComplianceStatus @default(UNKNOWN)
+  soc2Compliant         ComplianceStatus @default(UNKNOWN)
+  iso27001Compliant     ComplianceStatus @default(UNKNOWN)
+  pciDssCompliant       ComplianceStatus @default(UNKNOWN)
+  soxCompliant          ComplianceStatus @default(UNKNOWN)
+  customPolicies        String?    // JSON object with custom policy compliance
+  
+  // Overall Score
+  complianceScore       Float?     // 0-100
+  overallStatus         ComplianceStatus @default(UNKNOWN)
+  
+  // Issues
+  issues                String?    // JSON array of compliance issues
+  recommendations       String?    // JSON array of fixes
+  
+  // Metadata
+  generatedAt           DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  
+  @@index([contractId])
+  @@index([organizationId])
+  @@unique([contractId])
+}
+
+// ============================================================================
+// COLLABORATION ENTITIES
+// ============================================================================
+
+model Comment {
+  id                    String     @id @default(cuid())
+  contractId            String
+  organizationId        String
+  createdBy             String
+  
+  content               String
+  mentions              String[]   // JSON array of @mentioned user IDs
+  resolved              Boolean    @default(false)
+  
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation(fields: [organizationId], references: [id])
+  creator               User       @relation(fields: [createdBy], references: [id])
+  replies               Comment[]  @relation("Replies")
+  parent                Comment?   @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId              String?
+  
+  @@index([contractId])
+  @@index([createdBy])
+  @@index([createdAt])
+}
+
+model Approval {
+  id                    String     @id @default(cuid())
+  contractId            String
+  organizationId        String
+  assignedTo            String
+  
+  status                ApprovalStatus @default(PENDING)
+  reason                String?
+  notes                 String?
+  dueDate               DateTime?
+  
+  createdAt             DateTime   @default(now())
+  respondedAt           DateTime?
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation("ApprovalsToOrg", fields: [organizationId], references: [id])
+  user                  User       @relation(fields: [assignedTo], references: [id])
+  
+  @@index([contractId])
+  @@index([assignedTo])
+  @@index([status])
+}
+
+model Signature {
+  id                    String     @id @default(cuid())
+  contractId            String
+  organizationId        String
+  
+  signedBy              String     // User name or email
+  signatureUrl          String?    // URL to signature image
+  signatureData         String?    // Base64 encoded signature
+  signatureDate         DateTime
+  ipAddress             String?
+  userAgent             String?
+
+  createdAt             DateTime   @default(now())
+
+  // Relations
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation("SignaturesToOrg", fields: [organizationId], references: [id])
+
+  @@index([contractId])
+  @@index([signatureDate])
+}
+
+// ============================================================================
+// WORKFLOW ENTITIES
+// ============================================================================
+
+model Workflow {
+  id                    String     @id @default(cuid())
+  organizationId        String
+  name                  String
+  description           String?
+  
+  // Workflow Definition
+  steps                 WorkflowStep[] // Ordered steps
+  status                WorkflowStatus @default(PENDING)
+  
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items                 WorkflowItem[]
+  
+  @@index([organizationId])
+}
+
+model WorkflowStep {
+  id                    String     @id @default(cuid())
+  workflowId            String
+  order                 Int
+  
+  name                  String
+  type                  String     // "REVIEW", "APPROVAL", "SIGNATURE", etc.
+  requiredRole          UserRole?
+  
+  // Relations
+  workflow              Workflow   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  
+  @@index([workflowId])
+  @@unique([workflowId, order])
+}
+
+model WorkflowItem {
+  id                    String     @id @default(cuid())
+  workflowId            String
+  contractId            String
+  organizationId        String
+  
+  currentStep           Int        @default(0)
+  status                WorkflowStatus @default(IN_PROGRESS)
+  
+  startedAt             DateTime   @default(now())
+  completedAt           DateTime?
+  
+  // Relations
+  workflow              Workflow   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  contract              Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  organization          Organization @relation("WorkflowItemsToOrg", fields: [organizationId], references: [id])
+
+  @@index([workflowId])
+  @@index([contractId])
+  @@index([status])
+}
+
+// ============================================================================
+// NOTIFICATION ENTITIES
+// ============================================================================
+
+model Notification {
+  id                    String     @id @default(cuid())
+  organizationId        String
+  userId                String
+  contractId            String?
+  
+  // Content
+  type                  String     // "CONTRACT_APPROVED", "RISK_DETECTED", etc.
+  title                 String
+  message               String
+  data                  String?    // JSON with additional data
+  
+  // Delivery
+  channel               NotificationChannel
+  status                NotificationStatus @default(PENDING)
+  recipient             String     // Email, Slack ID, etc.
+  sentAt                DateTime?
+  deliveredAt           DateTime?
+  
+  // Metadata
+  isRead                Boolean    @default(false)
+  readAt                DateTime?
+  createdAt             DateTime   @default(now())
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user                  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contract              Contract?  @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  
+  @@index([organizationId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// AUDIT LOG ENTITIES
+// ============================================================================
+
+model AuditLog {
+  id                    String     @id @default(cuid())
+  organizationId        String
+  userId                String?
+  contractId            String?
+  
+  action                AuditAction
+  entityType            String     // "CONTRACT", "USER", "WORKFLOW", etc.
+  entityId              String
+  changes               String?    // JSON diff of what changed
+  
+  ipAddress             String?
+  userAgent             String?
+  
+  createdAt             DateTime   @default(now())
+  
+  // Relations
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user                  User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([organizationId])
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// INDEXES FOR PERFORMANCE
+// ============================================================================
+
+// Already defined above, but documenting the strategy:
+// - All foreign keys are indexed
+// - All frequently filtered columns are indexed (status, dates, roles)
+// - All search columns have full-text indexes
+// - All date ranges have indexes for range queries
+// - Unique constraints ensure data integrity

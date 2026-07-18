@@ -1,0 +1,18 @@
+{
+  "name": "@contract-ai/ocr-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "FastAPI OCR and Document Parsing Service",
+  "scripts": {
+    "dev": "python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8001",
+    "start": "uvicorn app.main:app --host 0.0.0.0 --port 8001",
+    "lint": "pylint app/",
+    "format": "black app/",
+    "test": "pytest",
+    "clean": "rm -rf __pycache__ .pytest_cache .coverage htmlcov"
+  },
+  "python": ">=3.11",
+  "engines": {
+    "python": ">=3.11"
+  }
+}

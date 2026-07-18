@@ -1,0 +1,43 @@
+# Build stage
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build web app
+RUN pnpm run build --filter=web
+
+# Production stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install production dependencies only
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built application and public files
+COPY --from=builder /app/apps/web/.next ./apps/web/.next
+COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
+
+# Set environment
+ENV NODE_ENV=production
+
+# Expose port
+EXPOSE 3000
+
+# Start application
+WORKDIR /app/apps/web
+CMD ["npm", "start"]
