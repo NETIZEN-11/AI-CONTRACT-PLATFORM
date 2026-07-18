@@ -9,6 +9,8 @@
     "lint": "pylint app/",
     "format": "black app/",
     "test": "pytest",
+    "type-check": "echo 'Type check not applicable for Python service'",
+    "build": "echo 'Build not applicable for Python service'",
     "clean": "rm -rf __pycache__ .pytest_cache .coverage htmlcov"
   },
   "python": ">=3.11",

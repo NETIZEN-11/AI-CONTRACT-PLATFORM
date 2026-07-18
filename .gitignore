@@ -12,7 +12,6 @@ node_modules/
 __pycache__/
 *.egg-info/
 .Python
-pnpm-lock.yaml
 
 # Build outputs
 dist/

@@ -11,16 +11,18 @@
     "db:push": "prisma db push",
     "db:seed": "ts-node prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "build": "tsc --project tsconfig.json",
+    "type-check": "tsc --noEmit --project tsconfig.json",
+    "lint": "echo 'No lint script yet'",
+    "test": "echo 'No test script yet'"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.1",
     "@prisma/client": "^5.11.0",
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^3.0.3"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^24",
     "prisma": "^5.11.0",
