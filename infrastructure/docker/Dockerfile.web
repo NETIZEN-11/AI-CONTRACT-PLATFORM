@@ -1,11 +1,18 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
+
+# pnpm 11 requires Node 22.13+. Pin to match the project's packageManager.
+ENV PNPM_VERSION=11.6.0
+ENV CI=true
 
 WORKDIR /app
 
+# Use corepack so the pnpm version is determined by the lockfile/packageManager.
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+
 # Install dependencies
 COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
@@ -14,12 +21,16 @@ COPY . .
 RUN pnpm run build --filter=web
 
 # Production stage
-FROM node:18-alpine
+FROM node:22-alpine
+
+ENV PNPM_VERSION=11.6.0
+ENV NODE_ENV=production
+ENV CI=true
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Use corepack for the runtime stage too
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
@@ -32,12 +43,10 @@ COPY --from=builder /app/apps/web/.next ./apps/web/.next
 COPY --from=builder /app/apps/web/public ./apps/web/public
 COPY --from=builder /app/apps/web/package.json ./apps/web/package.json
 
-# Set environment
-ENV NODE_ENV=production
+WORKDIR /app/apps/web
 
 # Expose port
 EXPOSE 3000
 
 # Start application
-WORKDIR /app/apps/web
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
