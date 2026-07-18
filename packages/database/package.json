@@ -15,7 +15,7 @@
     "build": "tsc --project tsconfig.json",
     "type-check": "tsc --noEmit --project tsconfig.json",
     "lint": "echo 'No lint script yet'",
-    "test": "echo 'No test script yet'"
+    "test": "echo 'No tests configured yet'"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.1",

@@ -71,7 +71,7 @@ export default function ContractsPage() {
                     <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {contract.effective_date ? new Date(contract.effective_date).toLocaleDateString() : 'N/A'}
+                        {contract.effectiveDate ? new Date(contract.effectiveDate).toLocaleDateString() : 'N/A'}
                       </span>
                       {contract.value && (
                         <span className="flex items-center gap-1">
