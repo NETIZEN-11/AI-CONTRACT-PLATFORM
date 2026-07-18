@@ -5,6 +5,7 @@ This guide explains how to set up and work with the Contract AI Platform codebas
 ## Project Structure
 
 ### Apps
+
 - **`apps/web`**: Next.js 15 frontend application
 - **`apps/api`**: NestJS REST/GraphQL API server
 - **`apps/ai-service`**: Python FastAPI AI analysis service
@@ -12,6 +13,7 @@ This guide explains how to set up and work with the Contract AI Platform codebas
 - **`apps/notification-service`**: Event-driven notification service
 
 ### Packages
+
 - **`packages/ui`**: Shared React components (shadcn/ui based)
 - **`packages/database`**: Prisma schema and database utilities
 - **`packages/auth`**: Authentication utilities and types
@@ -21,6 +23,7 @@ This guide explains how to set up and work with the Contract AI Platform codebas
 - **`packages/api-client`**: API client SDK
 
 ### Infrastructure
+
 - **`infrastructure/docker`**: Docker and Docker Compose configs
 - **`infrastructure/kubernetes`**: Kubernetes manifests
 - **`infrastructure/terraform`**: Terraform IaC
@@ -52,6 +55,7 @@ cp .env.example .env.local
 ```
 
 Edit `.env.local` with your configuration:
+
 - Database credentials
 - API keys (OpenAI, etc.)
 - OAuth credentials
@@ -60,11 +64,13 @@ Edit `.env.local` with your configuration:
 ### 3. Start Infrastructure
 
 Option A: Using Docker Compose
+
 ```bash
 docker-compose -f infrastructure/docker/docker-compose.yml up -d
 ```
 
 Option B: Manual local setup
+
 - Start PostgreSQL on port 5432
 - Start Redis on port 6379
 
@@ -79,24 +85,28 @@ pnpm db:seed
 ### 5. Start Development Servers
 
 Terminal 1 - Web App:
+
 ```bash
 cd apps/web
 pnpm dev
 ```
 
 Terminal 2 - API Server:
+
 ```bash
 cd apps/api
 pnpm start:dev
 ```
 
 Terminal 3 - AI Service:
+
 ```bash
 cd apps/ai-service
 python -m uvicorn app.main:app --reload
 ```
 
 Or start all at once:
+
 ```bash
 pnpm dev  # From root (requires Turbo)
 ```
@@ -106,6 +116,7 @@ pnpm dev  # From root (requires Turbo)
 ### Creating a New Feature
 
 1. **Create feature branch**
+
    ```bash
    git checkout -b feature/my-feature
    ```
@@ -113,6 +124,7 @@ pnpm dev  # From root (requires Turbo)
 2. **Make changes** in the relevant app or package
 
 3. **Test your changes**
+
    ```bash
    pnpm lint
    pnpm type-check
@@ -120,6 +132,7 @@ pnpm dev  # From root (requires Turbo)
    ```
 
 4. **Commit with conventional commits**
+
    ```bash
    git commit -m "feat: add new feature"
    ```
@@ -132,18 +145,21 @@ pnpm dev  # From root (requires Turbo)
 ### Code Quality
 
 **Linting**
+
 ```bash
 pnpm lint          # Lint all packages
 cd apps/web && pnpm lint    # Lint specific app
 ```
 
 **Formatting**
+
 ```bash
 pnpm format        # Format all files
 pnpm format:check  # Check formatting
 ```
 
 **Type Checking**
+
 ```bash
 pnpm type-check    # Type check all packages
 ```
@@ -151,12 +167,14 @@ pnpm type-check    # Type check all packages
 ### Database Changes
 
 **Create migration**
+
 ```bash
 cd apps/api
 pnpm prisma migrate dev --name add_new_table
 ```
 
 **View schema**
+
 ```bash
 cd apps/api
 pnpm db:studio    # Opens Prisma Studio
@@ -172,6 +190,7 @@ pnpm db:studio    # Opens Prisma Studio
 4. Add routes in the controller
 
 Example controller:
+
 ```typescript
 // apps/api/src/modules/contracts/contracts.controller.ts
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
@@ -259,6 +278,7 @@ export function ContractsList() {
 Located in `apps/ai-service/`
 
 Structure:
+
 ```
 app/
 ├── main.py              # FastAPI app
@@ -271,6 +291,7 @@ app/
 ```
 
 Example route:
+
 ```python
 # apps/ai-service/app/routers/analysis.py
 from fastapi import APIRouter, UploadFile, File
@@ -299,6 +320,7 @@ pnpm test:cov          # With coverage
 ### Unit Testing
 
 Example test:
+
 ```typescript
 // apps/api/src/modules/contracts/contracts.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
@@ -326,6 +348,7 @@ describe('ContractsService', () => {
 ### Backend Debugging
 
 VSCode launch config (`.vscode/launch.json`):
+
 ```json
 {
   "version": "0.2.0",
@@ -349,12 +372,14 @@ Use Chrome DevTools or VSCode debugger for Next.js.
 ## Performance Optimization
 
 ### Frontend
+
 - Use React.memo for expensive components
 - Implement code splitting with dynamic imports
 - Optimize images with next/image
 - Use SWR for data fetching with caching
 
 ### Backend
+
 - Add database indexes
 - Implement caching with Redis
 - Use pagination for large datasets
@@ -363,6 +388,7 @@ Use Chrome DevTools or VSCode debugger for Next.js.
 ## Common Issues
 
 ### PostgreSQL Connection Issues
+
 ```bash
 # Check connection string
 echo $DATABASE_URL
@@ -372,6 +398,7 @@ psql $DATABASE_URL
 ```
 
 ### Redis Connection Issues
+
 ```bash
 # Check Redis is running
 redis-cli ping
@@ -379,6 +406,7 @@ redis-cli ping
 ```
 
 ### Build Errors
+
 ```bash
 # Clean and rebuild
 pnpm clean

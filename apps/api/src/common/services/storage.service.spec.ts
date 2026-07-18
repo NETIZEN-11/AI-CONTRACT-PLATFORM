@@ -33,7 +33,7 @@ describe('StorageService', () => {
 
     service = module.get<StorageService>(StorageService);
     // Inject a mocked S3Client onto the service so we don't actually call AWS.
-    (service as unknown as { s3Client: { send: jest.Mock; } }).s3Client = {
+    (service as unknown as { s3Client: { send: jest.Mock } }).s3Client = {
       send: sendMock,
     };
     (service as unknown as { getSignedUrl: () => Promise<string> }).getSignedUrl = getSignedUrlMock;

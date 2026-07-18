@@ -12,12 +12,7 @@ import {
   Ip,
   Headers,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import {
@@ -66,7 +61,7 @@ export class AuthController {
   async login(
     @Body() dto: LoginDto,
     @Ip() ipAddress: string,
-    @Headers('user-agent') userAgent: string,
+    @Headers('user-agent') userAgent: string
   ): Promise<AuthResponseDto> {
     return this.authService.login(dto, ipAddress, userAgent);
   }
@@ -82,7 +77,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   async refreshToken(
     @Body() dto: RefreshTokenDto,
-    @Ip() ipAddress: string,
+    @Ip() ipAddress: string
   ): Promise<AuthResponseDto> {
     return this.authService.refreshToken(dto.refreshToken, ipAddress);
   }
@@ -93,10 +88,7 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({ status: 204, description: 'Logout successful' })
-  async logout(
-    @CurrentUser('id') userId: string,
-    @Body() dto?: RefreshTokenDto,
-  ): Promise<void> {
+  async logout(@CurrentUser('id') userId: string, @Body() dto?: RefreshTokenDto): Promise<void> {
     await this.authService.logout(userId, dto?.refreshToken);
   }
 
@@ -118,7 +110,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid current password' })
   async changePassword(
     @CurrentUser('id') userId: string,
-    @Body() dto: ChangePasswordDto,
+    @Body() dto: ChangePasswordDto
   ): Promise<void> {
     await this.authService.changePassword(userId, dto);
   }
@@ -160,10 +152,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Enable MFA after verification' })
   @ApiResponse({ status: 204, description: 'MFA enabled' })
   @ApiResponse({ status: 400, description: 'Invalid verification code' })
-  async enableMfa(
-    @CurrentUser('id') userId: string,
-    @Body() dto: EnableMfaDto,
-  ): Promise<void> {
+  async enableMfa(@CurrentUser('id') userId: string, @Body() dto: EnableMfaDto): Promise<void> {
     await this.authService.enableMfa(userId, dto.verificationCode);
   }
 
@@ -174,10 +163,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Disable MFA' })
   @ApiResponse({ status: 204, description: 'MFA disabled' })
   @ApiResponse({ status: 400, description: 'Invalid verification code' })
-  async disableMfa(
-    @CurrentUser('id') userId: string,
-    @Body() dto: VerifyMfaDto,
-  ): Promise<void> {
+  async disableMfa(@CurrentUser('id') userId: string, @Body() dto: VerifyMfaDto): Promise<void> {
     await this.authService.disableMfa(userId, dto.code);
   }
 

@@ -51,6 +51,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
 ## Service Architecture
 
 ### 1. Frontend Service (Next.js)
+
 - **Purpose**: User interface and client-side rendering
 - **Technology**: Next.js 15, React 19, TypeScript
 - **Port**: 3000
@@ -62,6 +63,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
   - Responsive design (mobile, tablet, desktop)
 
 ### 2. API Gateway (Nginx)
+
 - **Purpose**: Request routing, rate limiting, load balancing
 - **Port**: 80/443
 - **Responsibilities**:
@@ -72,6 +74,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
   - Request/response compression
 
 ### 3. Backend API Service (NestJS)
+
 - **Purpose**: Core business logic and REST/GraphQL API
 - **Technology**: NestJS, Prisma ORM, PostgreSQL
 - **Port**: 3001
@@ -83,6 +86,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
   - **Audit Logs**: Comprehensive audit trail
 
 ### 4. AI Analysis Service (Python FastAPI)
+
 - **Purpose**: Intelligent contract analysis and risk detection
 - **Technology**: Python, FastAPI, LangChain, LangGraph
 - **Port**: 8000
@@ -94,6 +98,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
   - AI Chat integration
 
 ### 5. OCR Service (Python FastAPI)
+
 - **Purpose**: Document parsing and text extraction
 - **Technology**: Python, FastAPI, PaddleOCR, Tesseract
 - **Port**: 8001
@@ -105,6 +110,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
   - Bulk document processing
 
 ### 6. Notification Service (Node.js/TypeScript)
+
 - **Purpose**: Event-driven notifications
 - **Technology**: NestJS, BullMQ, Kafka
 - **Port**: 8002
@@ -120,6 +126,7 @@ Contract AI Platform is built on a modern microservices architecture with clear 
 ### Primary Database (PostgreSQL)
 
 Schema Overview:
+
 ```
 Organizations
 ├── Teams
@@ -168,11 +175,13 @@ Organizations
 ## Communication Patterns
 
 ### Synchronous
+
 - REST API for CRUD operations
 - GraphQL for flexible queries
 - WebSocket for real-time updates
 
 ### Asynchronous
+
 - Kafka for event streaming
 - BullMQ for job processing
 - Webhooks for external integrations
@@ -180,6 +189,7 @@ Organizations
 ## Data Flow
 
 ### Contract Upload Flow
+
 ```
 1. User uploads document
    ↓
@@ -201,6 +211,7 @@ Organizations
 ```
 
 ### Risk Detection Flow
+
 ```
 1. AI Service receives contract
    ↓
@@ -222,6 +233,7 @@ Organizations
 ## Security Architecture
 
 ### Authentication & Authorization
+
 - **JWT Tokens**: Stateless authentication
 - **Refresh Tokens**: Long-lived token renewal
 - **OAuth2**: Social login integration
@@ -229,12 +241,14 @@ Organizations
 - **RBAC**: Role-based access control
 
 ### Data Protection
+
 - **TLS/SSL**: In-transit encryption
 - **At-Rest Encryption**: Encrypted database columns
 - **API Keys**: Secrets management via environment
 - **Row-Level Security**: Multi-tenant isolation
 
 ### API Security
+
 - **Rate Limiting**: Per-user and global limits
 - **CORS**: Cross-origin resource sharing
 - **CSRF Protection**: Token-based CSRF prevention
@@ -242,6 +256,7 @@ Organizations
 - **Output Encoding**: XSS prevention
 
 ### Audit & Compliance
+
 - **Audit Logs**: All user actions logged
 - **Encryption Keys**: Rotate regularly
 - **Data Residency**: Configurable storage location
@@ -250,17 +265,20 @@ Organizations
 ## Deployment Architecture
 
 ### Local Development
+
 - Docker Compose for all services
 - Local PostgreSQL and Redis
 - Shared development database
 
 ### Staging Environment
+
 - Kubernetes cluster
 - Managed PostgreSQL (Cloud SQL/RDS)
 - Managed Redis (ElastiCache/MemoryStor)
 - Separate secrets management
 
 ### Production Environment
+
 - Multi-zone Kubernetes cluster
 - Auto-scaling based on metrics
 - High availability setup
@@ -270,17 +288,20 @@ Organizations
 ## Scalability Considerations
 
 ### Horizontal Scaling
+
 - Stateless services scale easily
 - Load balancing via Nginx/K8s
 - Database connection pooling
 - Redis cluster for caching
 
 ### Vertical Scaling
+
 - Increase resource requests in K8s
 - Database instance upsizing
 - Vector DB sharding
 
 ### Performance Optimization
+
 - Database indexes on frequently queried columns
 - Caching frequently accessed data
 - Pagination for large result sets
@@ -290,24 +311,28 @@ Organizations
 ## Monitoring & Observability
 
 ### Logging
+
 - ELK Stack (Elasticsearch, Logstash, Kibana)
 - Structured logging with JSON
 - Log aggregation from all services
 - Centralized log search
 
 ### Metrics
+
 - Prometheus for metrics collection
 - Grafana for visualization
 - Custom business metrics
 - Infrastructure metrics (CPU, Memory, Disk)
 
 ### Tracing
+
 - OpenTelemetry for distributed tracing
 - Request flow tracking across services
 - Performance bottleneck identification
 - Error tracking with Sentry
 
 ### Alerting
+
 - Alert rules based on thresholds
 - Multi-channel notifications (email, Slack)
 - On-call rotation management
@@ -316,6 +341,7 @@ Organizations
 ## Technology Decisions
 
 ### Why NestJS for Backend?
+
 - Enterprise-grade framework
 - Built-in dependency injection
 - TypeScript support
@@ -323,6 +349,7 @@ Organizations
 - Testing utilities
 
 ### Why FastAPI for AI Service?
+
 - High performance async framework
 - Automatic API documentation
 - Type hints with Pydantic
@@ -330,6 +357,7 @@ Organizations
 - Large ML ecosystem
 
 ### Why PostgreSQL?
+
 - ACID compliance
 - Complex queries support
 - JSON/JSONB support
@@ -337,6 +365,7 @@ Organizations
 - Proven reliability
 
 ### Why Kafka for Messaging?
+
 - High throughput
 - Event replay capability
 - Multiple subscribers

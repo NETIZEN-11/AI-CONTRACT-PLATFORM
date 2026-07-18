@@ -8,7 +8,7 @@ import { SendNotificationDto } from './dto';
 export class NotificationsController {
   constructor(
     private readonly notificationsService: NotificationsService,
-    @InjectQueue('notifications') private notificationsQueue: Queue,
+    @InjectQueue('notifications') private notificationsQueue: Queue
   ) {}
 
   @Post('send')

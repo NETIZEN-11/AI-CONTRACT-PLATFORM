@@ -18,7 +18,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     try {
       await login(email, password);
       router.push('/dashboard');
@@ -100,11 +100,27 @@ export default function LoginPage() {
           {/* OAuth */}
           <Button variant="outline" className="w-full h-10 mb-4" disabled={isLoading}>
             <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 0c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0z" fill="#000" fillOpacity="0.1"/>
-              <path d="M18.5 9.6c0-.3 0-.6-.1-.9h-5.4v1.7h3.1c-.1.8-.7 1.4-1.5 1.8v2h2.4c1.4-1.3 2.2-3.3 2.2-5.6z" fill="#4285F4"/>
-              <path d="M12 19c1.7 0 3.2-.5 4.2-1.5l-2.4-2c-.6.4-1.4.7-2.3.7-1.7 0-3.2-1.1-3.8-2.6H5.6v2.1C6.6 17.9 9 19 12 19z" fill="#34A853"/>
-              <path d="M8.1 14.7c-.3-.8-.4-1.6-.4-2.5 0-.9.1-1.7.4-2.5V7.6H5.6C4.6 9.2 4 11 4 12s.6 2.8 1.6 4.2l2.5-1.5z" fill="#FBBC05"/>
-              <path d="M12 4.5c2 0 3.8.7 5.2 2l3.9-3.9C15.2 1 13.6 0 12 0 9 0 6.6 1.1 5.6 2.8l2.5 1.9c.6-1.5 2.1-2.2 3.9-2.2z" fill="#EA4335"/>
+              <path
+                d="M12 0c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0z"
+                fill="#000"
+                fillOpacity="0.1"
+              />
+              <path
+                d="M18.5 9.6c0-.3 0-.6-.1-.9h-5.4v1.7h3.1c-.1.8-.7 1.4-1.5 1.8v2h2.4c1.4-1.3 2.2-3.3 2.2-5.6z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 19c1.7 0 3.2-.5 4.2-1.5l-2.4-2c-.6.4-1.4.7-2.3.7-1.7 0-3.2-1.1-3.8-2.6H5.6v2.1C6.6 17.9 9 19 12 19z"
+                fill="#34A853"
+              />
+              <path
+                d="M8.1 14.7c-.3-.8-.4-1.6-.4-2.5 0-.9.1-1.7.4-2.5V7.6H5.6C4.6 9.2 4 11 4 12s.6 2.8 1.6 4.2l2.5-1.5z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 4.5c2 0 3.8.7 5.2 2l3.9-3.9C15.2 1 13.6 0 12 0 9 0 6.6 1.1 5.6 2.8l2.5 1.9c.6-1.5 2.1-2.2 3.9-2.2z"
+                fill="#EA4335"
+              />
             </svg>
             Continue with Google
           </Button>

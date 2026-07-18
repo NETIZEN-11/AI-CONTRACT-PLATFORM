@@ -6,7 +6,7 @@ Enterprise-grade OCR and document processing service for the AI Contract Review 
 
 - **Multi-Engine OCR**: PaddleOCR (primary), Tesseract (fallback), Hybrid mode
 - **Document Support**: PDF, DOCX, DOC, PNG, JPG, JPEG, TIFF, BMP, TXT, RTF
-- **Smart Processing**: 
+- **Smart Processing**:
   - Native text extraction for text-based PDFs
   - OCR for scanned PDFs and images
   - Automatic fallback between engines
@@ -88,6 +88,7 @@ gunicorn app.main:app \
 ## API Documentation
 
 Once running, visit:
+
 - **Swagger UI**: http://localhost:8001/docs
 - **ReDoc**: http://localhost:8001/redoc
 
@@ -105,6 +106,7 @@ curl -X POST "http://localhost:8001/api/v1/ocr/extract" \
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -135,6 +137,7 @@ curl -X POST "http://localhost:8001/api/v1/ocr/process?extract_metadata=true&chu
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -142,10 +145,7 @@ Response:
   "confidence": 0.95,
   "file_name": "contract.pdf",
   "file_type": "pdf",
-  "chunks": [
-    "Chunk 1...",
-    "Chunk 2..."
-  ],
+  "chunks": ["Chunk 1...", "Chunk 2..."],
   "metadata": {
     "pages": 5,
     "title": "Service Agreement",
@@ -174,6 +174,7 @@ curl http://localhost:8001/api/v1/ocr/supported-formats
 ```
 
 Response:
+
 ```json
 {
   "supported_formats": ["pdf", "png", "jpg", "jpeg", "tiff", "bmp", "docx", "doc", "txt", "rtf"],
@@ -241,6 +242,7 @@ GET /metrics
 ```
 
 Available metrics:
+
 - `ocr_requests_total` - Total OCR requests
 - `ocr_processing_duration_seconds` - Processing time
 - `ocr_file_size_bytes` - File sizes processed
@@ -257,6 +259,7 @@ The service returns standard HTTP status codes:
 - `500` - Server error (OCR processing failed)
 
 Example error response:
+
 ```json
 {
   "detail": "OCR processing failed: Unsupported file format"
@@ -301,11 +304,13 @@ TESSERACT_CMD=/usr/local/bin/tesseract  # Update with your path
 ### Out of memory
 
 Reduce concurrent workers:
+
 ```env
 MAX_WORKERS=2
 ```
 
 Or reduce batch size:
+
 ```env
 BATCH_SIZE=5
 ```
@@ -319,13 +324,9 @@ BATCH_SIZE=5
 const formData = new FormData();
 formData.append('file', file);
 
-const response = await axios.post(
-  'http://localhost:8001/api/v1/ocr/extract',
-  formData,
-  {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }
-);
+const response = await axios.post('http://localhost:8001/api/v1/ocr/extract', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' },
+});
 
 const { text, confidence, pages } = response.data;
 ```
@@ -342,7 +343,7 @@ with open('contract.pdf', 'rb') as f:
         'http://localhost:8001/api/v1/ocr/extract',
         files=files
     )
-    
+
 result = response.json()
 print(result['text'])
 ```

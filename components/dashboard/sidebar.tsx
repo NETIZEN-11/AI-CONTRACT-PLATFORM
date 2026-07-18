@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
   FileText,
@@ -11,8 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronDown,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/' },
@@ -20,10 +20,10 @@ const menuItems = [
   { icon: CheckSquare, label: 'Reviews', href: '/reviews' },
   { icon: BarChart3, label: 'Analytics', href: '/analytics' },
   { icon: Settings, label: 'Settings', href: '/settings' },
-]
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div className="hidden md:flex flex-col w-64 border-r border-border bg-card">
@@ -41,8 +41,8 @@ export function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-4 py-6">
         <div className="space-y-2">
           {menuItems.map((item) => {
-            const Icon = item.icon
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+            const Icon = item.icon;
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <Link
@@ -58,7 +58,7 @@ export function Sidebar() {
                 <Icon className="w-5 h-5" />
                 {item.label}
               </Link>
-            )
+            );
           })}
         </div>
       </nav>
@@ -83,5 +83,5 @@ export function Sidebar() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

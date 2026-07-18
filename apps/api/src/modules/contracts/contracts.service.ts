@@ -23,7 +23,7 @@ export class ContractsService {
 
   constructor(
     private prisma: PrismaService,
-    private storageService: StorageService,
+    private storageService: StorageService
   ) {}
 
   /**
@@ -32,7 +32,7 @@ export class ContractsService {
   async create(
     dto: CreateContractDto,
     userId: string,
-    organizationId: string,
+    organizationId: string
   ): Promise<ContractResponseDto> {
     // Verify team belongs to organization if teamId is provided
     if (dto.teamId) {
@@ -80,17 +80,13 @@ export class ContractsService {
     contractId: string,
     file: Express.Multer.File,
     userId: string,
-    organizationId: string,
+    organizationId: string
   ): Promise<ContractResponseDto> {
     // Verify contract belongs to organization
     const contract = await this.findOneOrFail(contractId, organizationId);
 
     // Upload to S3
-    const uploadResult = await this.storageService.uploadFile(
-      file,
-      organizationId,
-      'contracts',
-    );
+    const uploadResult = await this.storageService.uploadFile(file, organizationId, 'contracts');
 
     // Delete old file if exists
     if (contract.fileKey) {
@@ -113,7 +109,13 @@ export class ContractsService {
     });
 
     // Create version
-    await this.createVersion(contractId, updatedContract.title, uploadResult.key, uploadResult.url, userId);
+    await this.createVersion(
+      contractId,
+      updatedContract.title,
+      uploadResult.key,
+      uploadResult.url,
+      userId
+    );
 
     this.logger.log(`File uploaded for contract: ${contractId}`);
 
@@ -126,7 +128,7 @@ export class ContractsService {
   async findAll(
     query: QueryContractDto,
     organizationId: string,
-    userId: string,
+    userId: string
   ): Promise<ContractListResponseDto> {
     const where: Prisma.ContractWhereInput = {
       organizationId,
@@ -223,10 +225,7 @@ export class ContractsService {
   /**
    * Find one contract by ID
    */
-  async findOne(
-    contractId: string,
-    organizationId: string,
-  ): Promise<ContractResponseDto> {
+  async findOne(contractId: string, organizationId: string): Promise<ContractResponseDto> {
     const contract = await this.findOneOrFail(contractId, organizationId);
     return this.mapToResponseDto(contract);
   }
@@ -238,7 +237,7 @@ export class ContractsService {
     contractId: string,
     dto: UpdateContractDto,
     userId: string,
-    organizationId: string,
+    organizationId: string
   ): Promise<ContractResponseDto> {
     await this.findOneOrFail(contractId, organizationId);
 
@@ -283,11 +282,7 @@ export class ContractsService {
   /**
    * Archive contract (soft delete)
    */
-  async archive(
-    contractId: string,
-    userId: string,
-    organizationId: string,
-  ): Promise<void> {
+  async archive(contractId: string, userId: string, organizationId: string): Promise<void> {
     await this.findOneOrFail(contractId, organizationId);
 
     await this.prisma.contract.update({
@@ -307,7 +302,7 @@ export class ContractsService {
   async restore(
     contractId: string,
     userId: string,
-    organizationId: string,
+    organizationId: string
   ): Promise<ContractResponseDto> {
     const contract = await this.prisma.contract.findFirst({
       where: {
@@ -336,11 +331,7 @@ export class ContractsService {
   /**
    * Permanently delete contract
    */
-  async delete(
-    contractId: string,
-    userId: string,
-    organizationId: string,
-  ): Promise<void> {
+  async delete(contractId: string, userId: string, organizationId: string): Promise<void> {
     const contract = await this.findOneOrFail(contractId, organizationId);
 
     // Delete file from S3
@@ -401,7 +392,11 @@ export class ContractsService {
         where: {
           organizationId,
           status: {
-            in: [ContractStatus.UNDER_REVIEW, ContractStatus.AI_REVIEW, ContractStatus.LEGAL_REVIEW],
+            in: [
+              ContractStatus.UNDER_REVIEW,
+              ContractStatus.AI_REVIEW,
+              ContractStatus.LEGAL_REVIEW,
+            ],
           },
           archivedAt: null,
         },
@@ -442,10 +437,7 @@ export class ContractsService {
   /**
    * Download contract file
    */
-  async getDownloadUrl(
-    contractId: string,
-    organizationId: string,
-  ): Promise<string> {
+  async getDownloadUrl(contractId: string, organizationId: string): Promise<string> {
     const contract = await this.findOneOrFail(contractId, organizationId);
 
     if (!contract.fileKey) {
@@ -475,7 +467,7 @@ export class ContractsService {
     title: string,
     fileKey: string,
     fileUrl: string,
-    userId: string,
+    userId: string
   ) {
     // Get latest version number
     const latestVersion = await this.prisma.contractVersion.findFirst({

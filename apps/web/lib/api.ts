@@ -66,10 +66,7 @@ class ApiClient {
     this.token = null;
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -187,7 +184,7 @@ class ApiClient {
     const url = `${API_BASE_URL}/contracts/${id}/upload`;
     const response = await fetch(url, {
       method: 'POST',
-      headers: this.token ? { 'Authorization': `Bearer ${this.token}` } : {},
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
       body: formData,
     });
 

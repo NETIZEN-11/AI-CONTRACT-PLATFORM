@@ -17,11 +17,15 @@
       "cache": true
     },
     "type-check": {
+      "dependsOn": ["^db:generate"],
       "outputs": [],
       "cache": true
     },
     "test": {
       "outputs": ["coverage/**"],
+      "cache": true
+    },
+    "db:generate": {
       "cache": true
     },
     "db:migrate": {

@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { Search, Bell, Moon, Sun, Menu } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { useTheme } from 'next-themes'
+import { Search, Bell, Moon, Sun, Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useTheme } from 'next-themes';
 
 export function Header() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
@@ -31,11 +31,7 @@ export function Header() {
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="text-muted-foreground"
         >
-          {theme === 'dark' ? (
-            <Sun className="w-5 h-5" />
-          ) : (
-            <Moon className="w-5 h-5" />
-          )}
+          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </Button>
 
         {/* Notifications */}
@@ -50,5 +46,5 @@ export function Header() {
         </Button>
       </div>
     </header>
-  )
+  );
 }

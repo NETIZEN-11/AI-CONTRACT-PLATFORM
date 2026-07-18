@@ -32,7 +32,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
   /**
@@ -93,11 +93,7 @@ export class AuthService {
   /**
    * Login user with email and password
    */
-  async login(
-    dto: LoginDto,
-    ipAddress?: string,
-    userAgent?: string,
-  ): Promise<AuthResponseDto> {
+  async login(dto: LoginDto, ipAddress?: string, userAgent?: string): Promise<AuthResponseDto> {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
@@ -111,7 +107,7 @@ export class AuthService {
     // Check if account is locked
     if (user.accountLockedUntil && user.accountLockedUntil > new Date()) {
       throw new UnauthorizedException(
-        `Account is locked. Try again after ${user.accountLockedUntil.toISOString()}`,
+        `Account is locked. Try again after ${user.accountLockedUntil.toISOString()}`
       );
     }
 
@@ -166,10 +162,7 @@ export class AuthService {
   /**
    * Refresh access token
    */
-  async refreshToken(
-    refreshToken: string,
-    ipAddress?: string,
-  ): Promise<AuthResponseDto> {
+  async refreshToken(refreshToken: string, ipAddress?: string): Promise<AuthResponseDto> {
     try {
       // Verify refresh token
       const payload = this.jwtService.verify(refreshToken, {
@@ -191,10 +184,7 @@ export class AuthService {
       }
 
       // Generate new tokens
-      const authResponse = await this.generateAuthResponse(
-        storedToken.user,
-        ipAddress,
-      );
+      const authResponse = await this.generateAuthResponse(storedToken.user, ipAddress);
 
       // Revoke old refresh token
       await this.prisma.refreshToken.update({
@@ -231,10 +221,7 @@ export class AuthService {
   /**
    * Change user password
    */
-  async changePassword(
-    userId: string,
-    dto: ChangePasswordDto,
-  ): Promise<void> {
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -244,10 +231,7 @@ export class AuthService {
     }
 
     // Verify current password
-    const isPasswordValid = await bcrypt.compare(
-      dto.currentPassword,
-      user.hashedPassword,
-    );
+    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.hashedPassword);
 
     if (!isPasswordValid) {
       throw new BadRequestException('Current password is incorrect');
@@ -289,10 +273,7 @@ export class AuthService {
 
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(resetToken)
-      .digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
     // Save hashed token
     await this.prisma.user.update({
@@ -313,10 +294,7 @@ export class AuthService {
    * Reset password with token
    */
   async resetPassword(dto: ResetPasswordDto): Promise<void> {
-    const hashedToken = crypto
-      .createHash('sha256')
-      .update(dto.token)
-      .digest('hex');
+    const hashedToken = crypto.createHash('sha256').update(dto.token).digest('hex');
 
     const user = await this.prisma.user.findFirst({
       where: {
@@ -373,13 +351,11 @@ export class AuthService {
 
     // Generate backup codes
     const backupCodes = Array.from({ length: 10 }, () =>
-      crypto.randomBytes(4).toString('hex').toUpperCase(),
+      crypto.randomBytes(4).toString('hex').toUpperCase()
     );
 
     // Store encrypted backup codes (temporary until user verifies)
-    const hashedBackupCodes = await Promise.all(
-      backupCodes.map(code => this.hashPassword(code)),
-    );
+    const hashedBackupCodes = await Promise.all(backupCodes.map((code) => this.hashPassword(code)));
 
     // Temporarily store secret (will be confirmed after verification)
     await this.prisma.user.update({
@@ -481,9 +457,7 @@ export class AuthService {
       include: { permission: true },
     });
 
-    return rolePermissions.map(
-      rp => `${rp.permission.resource}:${rp.permission.action}`,
-    );
+    return rolePermissions.map((rp) => `${rp.permission.resource}:${rp.permission.action}`);
   }
 
   /**
@@ -493,7 +467,7 @@ export class AuthService {
     user: any,
     ipAddress?: string,
     userAgent?: string,
-    rememberMe = false,
+    rememberMe = false
   ): Promise<AuthResponseDto> {
     const permissions = await this.getUserPermissions(user.id);
 
@@ -510,17 +484,19 @@ export class AuthService {
       {
         secret: this.configService.get('jwt.secret'),
         expiresIn: accessTokenExpiry,
-      },
+      }
     );
 
     // Generate refresh token
-    const refreshTokenExpiry = rememberMe ? '30d' : this.configService.get('jwt.refreshExpiresIn', '7d');
+    const refreshTokenExpiry = rememberMe
+      ? '30d'
+      : this.configService.get('jwt.refreshExpiresIn', '7d');
     const refreshToken = this.jwtService.sign(
       { sub: user.id },
       {
         secret: this.configService.get('jwt.refreshSecret'),
         expiresIn: refreshTokenExpiry,
-      },
+      }
     );
 
     // Store refresh token
@@ -530,9 +506,7 @@ export class AuthService {
         token: refreshToken,
         deviceInfo: userAgent,
         ipAddress,
-        expiresAt: new Date(
-          Date.now() + (rememberMe ? 30 : 7) * 24 * 60 * 60 * 1000,
-        ),
+        expiresAt: new Date(Date.now() + (rememberMe ? 30 : 7) * 24 * 60 * 60 * 1000),
       },
     });
 
@@ -583,9 +557,7 @@ export class AuthService {
         where: { id: userId },
         data: {
           failedLoginAttempts: attempts,
-          accountLockedUntil: new Date(
-            Date.now() + this.LOCK_DURATION_MINUTES * 60 * 1000,
-          ),
+          accountLockedUntil: new Date(Date.now() + this.LOCK_DURATION_MINUTES * 60 * 1000),
         },
       });
 

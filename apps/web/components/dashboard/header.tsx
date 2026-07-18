@@ -24,7 +24,7 @@ export function Header() {
         <button className="p-2 hover:bg-muted rounded-lg transition-colors">
           <Bell className="w-5 h-5 text-muted-foreground" />
         </button>
-        
+
         <div className="flex items-center gap-3 pl-4 border-l border-border">
           <div className="text-right">
             <p className="text-sm font-medium">{user?.name || 'User'}</p>

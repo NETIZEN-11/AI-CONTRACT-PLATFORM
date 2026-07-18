@@ -27,21 +27,7 @@ import { PrismaModule } from '@contract-ai/database';
     PrismaModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    LocalStrategy,
-    JwtAuthGuard,
-    RolesGuard,
-    PermissionsGuard,
-  ],
-  exports: [
-    AuthService,
-    JwtAuthGuard,
-    RolesGuard,
-    PermissionsGuard,
-    PassportModule,
-    JwtModule,
-  ],
+  providers: [AuthService, JwtStrategy, LocalStrategy, JwtAuthGuard, RolesGuard, PermissionsGuard],
+  exports: [AuthService, JwtAuthGuard, RolesGuard, PermissionsGuard, PassportModule, JwtModule],
 })
 export class AuthModule {}

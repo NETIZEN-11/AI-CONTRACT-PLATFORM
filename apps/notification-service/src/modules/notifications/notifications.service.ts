@@ -12,7 +12,7 @@ export class NotificationsService extends WorkerHost {
 
   constructor(
     private readonly emailService: EmailService,
-    private readonly slackService: SlackService,
+    private readonly slackService: SlackService
   ) {
     super();
   }
@@ -37,7 +37,10 @@ export class NotificationsService extends WorkerHost {
     try {
       await this.sendNotification(job.data);
     } catch (error) {
-      this.logger.error(`Failed to process job: ${job.id}`, error instanceof Error ? error.stack : String(error));
+      this.logger.error(
+        `Failed to process job: ${job.id}`,
+        error instanceof Error ? error.stack : String(error)
+      );
       throw error;
     }
   }

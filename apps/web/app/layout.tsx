@@ -1,10 +1,11 @@
-import { Analytics } from '@vercel/analytics/next'
-import type { Metadata, Viewport } from 'next'
-import './globals.css'
+import { Analytics } from '@vercel/analytics/next';
+import type { Metadata, Viewport } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'ContractAI - Intelligent Contract Review Platform',
-  description: 'AI-powered contract analysis, risk detection, and compliance checking for legal professionals',
+  description:
+    'AI-powered contract analysis, risk detection, and compliance checking for legal professionals',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -23,23 +24,21 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
-}
+};
 
 export const viewport: Viewport = {
   colorScheme: 'dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0f1419' },
-  ],
+  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#0f1419' }],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className="dark">
@@ -48,5 +47,5 @@ export default function RootLayout({
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
-  )
+  );
 }

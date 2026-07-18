@@ -49,7 +49,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     }
 
     const models = Reflect.ownKeys(this).filter(
-      (key) => typeof key === 'string' && key[0] !== '_' && key[0] !== '$',
+      (key) => typeof key === 'string' && key[0] !== '_' && key[0] !== '$'
     );
 
     return Promise.all(
@@ -58,7 +58,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         if (model && typeof model === 'object' && 'deleteMany' in model) {
           return (model as any).deleteMany();
         }
-      }),
+      })
     );
   }
 

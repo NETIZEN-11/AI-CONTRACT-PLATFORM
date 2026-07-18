@@ -21,6 +21,7 @@ Contract AI Platform is a comprehensive SaaS solution that automates contract an
 ## Technology Stack
 
 ### Frontend
+
 - **Next.js 15** - React framework
 - **React 19** - UI library
 - **TypeScript** - Type safety
@@ -30,6 +31,7 @@ Contract AI Platform is a comprehensive SaaS solution that automates contract an
 - **Zustand** - State management
 
 ### Backend
+
 - **NestJS** - Node.js framework
 - **Prisma ORM** - Database ORM
 - **PostgreSQL** - Primary database
@@ -38,6 +40,7 @@ Contract AI Platform is a comprehensive SaaS solution that automates contract an
 - **Kafka** - Event streaming
 
 ### AI/ML Services
+
 - **Python FastAPI** - AI service framework
 - **LangGraph** - Agentic workflows
 - **LangChain** - LLM orchestration
@@ -47,6 +50,7 @@ Contract AI Platform is a comprehensive SaaS solution that automates contract an
 - **PaddleOCR/Tesseract** - Document OCR
 
 ### Infrastructure
+
 - **Docker** - Containerization
 - **Kubernetes** - Orchestration
 - **Terraform** - IaC
@@ -94,28 +98,33 @@ contract-ai-platform/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd contract-ai-platform
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Setup environment variables**
+
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration
    ```
 
 4. **Start infrastructure services**
+
    ```bash
    docker-compose -f infrastructure/docker/docker-compose.yml up -d
    ```
 
 5. **Setup database**
+
    ```bash
    pnpm db:migrate
    pnpm db:seed
@@ -127,6 +136,7 @@ contract-ai-platform/
    ```
 
 The application will be available at:
+
 - Frontend: http://localhost:3000
 - API: http://localhost:3001
 - AI Service: http://localhost:8000
@@ -166,6 +176,7 @@ pnpm clean            # Clean all build artifacts
 ### Project Scripts
 
 Located in `/scripts/`:
+
 - `setup-dev.sh` - Development environment setup
 - `backup-db.sh` - Database backup script
 - `generate-docs.sh` - Generate API documentation
@@ -208,6 +219,7 @@ Display Results
 ## API Documentation
 
 API documentation is available at:
+
 - **Swagger UI**: http://localhost:3001/api/docs
 - **GraphQL**: http://localhost:3001/graphql
 
@@ -216,6 +228,7 @@ API documentation is available at:
 Prisma schema is located at `packages/database/prisma/schema.prisma`
 
 Key models:
+
 - Users & Organizations
 - Contracts & Contract Versions
 - Clauses & Clause Library
@@ -238,11 +251,13 @@ Key models:
 ### Production Deployment
 
 1. **Build Docker images**
+
    ```bash
    pnpm docker:build
    ```
 
 2. **Deploy to Kubernetes**
+
    ```bash
    kubectl apply -f infrastructure/kubernetes/
    ```

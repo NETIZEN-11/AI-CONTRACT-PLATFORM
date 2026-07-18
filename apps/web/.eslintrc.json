@@ -1,7 +1,4 @@
 {
   "extends": ["../../.eslintrc.json"],
-  "ignorePatterns": [
-    ".next/",
-    "node_modules/"
-  ]
+  "ignorePatterns": [".next/", "node_modules/"]
 }

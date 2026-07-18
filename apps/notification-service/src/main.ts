@@ -4,16 +4,16 @@ import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   // Enable CORS
   app.enableCors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
   });
-  
+
   const port = process.env.PORT || 8002;
   await app.listen(port);
-  
+
   Logger.log(`Notification Service is running on http://localhost:${port}`, 'Bootstrap');
 }
 

@@ -7,7 +7,9 @@ export class AnalyticsService {
 
   async getDashboardMetrics(query: AnalyticsQueryDto) {
     try {
-      this.logger.log(`Fetching dashboard metrics for period: ${query.startDate} to ${query.endDate}`);
+      this.logger.log(
+        `Fetching dashboard metrics for period: ${query.startDate} to ${query.endDate}`
+      );
 
       // TODO: Aggregate metrics from database
       return {
@@ -27,7 +29,9 @@ export class AnalyticsService {
 
   async getContractAnalytics(query: AnalyticsQueryDto) {
     try {
-      this.logger.log(`Fetching contract analytics for period: ${query.startDate} to ${query.endDate}`);
+      this.logger.log(
+        `Fetching contract analytics for period: ${query.startDate} to ${query.endDate}`
+      );
 
       // TODO: Query and aggregate contract data
       return {
@@ -61,7 +65,9 @@ export class AnalyticsService {
 
   async getComplianceAnalytics(query: AnalyticsQueryDto) {
     try {
-      this.logger.log(`Fetching compliance analytics for period: ${query.startDate} to ${query.endDate}`);
+      this.logger.log(
+        `Fetching compliance analytics for period: ${query.startDate} to ${query.endDate}`
+      );
 
       // TODO: Query compliance data
       return {

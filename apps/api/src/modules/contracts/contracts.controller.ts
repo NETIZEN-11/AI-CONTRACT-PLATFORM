@@ -16,13 +16,7 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiConsumes,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ContractsService } from './contracts.service';
 import {
@@ -60,7 +54,7 @@ export class ContractsController {
   async create(
     @Body() dto: CreateContractDto,
     @CurrentUser('id') userId: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<ContractResponseDto> {
     return this.contractsService.create(dto, userId, organizationId);
   }
@@ -85,11 +79,11 @@ export class ContractsController {
             fileType: /(pdf|docx|doc|txt|rtf|png|jpg|jpeg)$/,
           }),
         ],
-      }),
+      })
     )
     file: Express.Multer.File,
     @CurrentUser('id') userId: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<ContractResponseDto> {
     return this.contractsService.uploadFile(contractId, file, userId, organizationId);
   }
@@ -105,7 +99,7 @@ export class ContractsController {
   async findAll(
     @Query() query: QueryContractDto,
     @CurrentUser('organizationId') organizationId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') userId: string
   ): Promise<ContractListResponseDto> {
     return this.contractsService.findAll(query, organizationId, userId);
   }
@@ -118,9 +112,7 @@ export class ContractsController {
     description: 'Statistics retrieved successfully',
     type: ContractStatsDto,
   })
-  async getStats(
-    @CurrentUser('organizationId') organizationId: string,
-  ): Promise<ContractStatsDto> {
+  async getStats(@CurrentUser('organizationId') organizationId: string): Promise<ContractStatsDto> {
     return this.contractsService.getStats(organizationId);
   }
 
@@ -135,7 +127,7 @@ export class ContractsController {
   @ApiResponse({ status: 404, description: 'Contract not found' })
   async findOne(
     @Param('id') id: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<ContractResponseDto> {
     return this.contractsService.findOne(id, organizationId);
   }
@@ -150,7 +142,7 @@ export class ContractsController {
   })
   async getDownloadUrl(
     @Param('id') id: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ) {
     const url = await this.contractsService.getDownloadUrl(id, organizationId);
     return { url };
@@ -162,7 +154,7 @@ export class ContractsController {
   @ApiResponse({ status: 200, description: 'Versions retrieved successfully' })
   async getVersions(
     @Param('id') id: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ) {
     return this.contractsService.getVersions(id, organizationId);
   }
@@ -180,7 +172,7 @@ export class ContractsController {
     @Param('id') id: string,
     @Body() dto: UpdateContractDto,
     @CurrentUser('id') userId: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<ContractResponseDto> {
     return this.contractsService.update(id, dto, userId, organizationId);
   }
@@ -193,7 +185,7 @@ export class ContractsController {
   async archive(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<void> {
     await this.contractsService.archive(id, userId, organizationId);
   }
@@ -209,7 +201,7 @@ export class ContractsController {
   async restore(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<ContractResponseDto> {
     return this.contractsService.restore(id, userId, organizationId);
   }
@@ -222,7 +214,7 @@ export class ContractsController {
   async delete(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
-    @CurrentUser('organizationId') organizationId: string,
+    @CurrentUser('organizationId') organizationId: string
   ): Promise<void> {
     await this.contractsService.delete(id, userId, organizationId);
   }

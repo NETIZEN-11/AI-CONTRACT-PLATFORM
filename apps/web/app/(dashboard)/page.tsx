@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Upload, Clock, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react'
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Upload, Clock, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 
 export default function DashboardPage() {
   return (
@@ -75,7 +75,12 @@ export default function DashboardPage() {
           {[
             { name: 'Service Agreement.pdf', status: 'Analyzed', risk: 'Low', date: '2 hours ago' },
             { name: 'NDA_2024.docx', status: 'Pending', risk: 'Medium', date: '5 hours ago' },
-            { name: 'Employment_Contract.pdf', status: 'Analyzed', risk: 'High', date: '1 day ago' },
+            {
+              name: 'Employment_Contract.pdf',
+              status: 'Analyzed',
+              risk: 'High',
+              date: '1 day ago',
+            },
           ].map((contract) => (
             <div
               key={contract.name}
@@ -86,22 +91,33 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground">{contract.date}</p>
               </div>
               <div className="flex items-center gap-4">
-                <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-                  contract.risk === 'Low' ? 'bg-green-500/10 text-green-700 dark:text-green-400' :
-                  contract.risk === 'Medium' ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' :
-                  'bg-red-500/10 text-red-700 dark:text-red-400'
-                }`}>
-                  <span className={`w-2 h-2 rounded-full ${
-                    contract.risk === 'Low' ? 'bg-green-500' :
-                    contract.risk === 'Medium' ? 'bg-amber-500' :
-                    'bg-red-500'
-                  }`}></span>
+                <div
+                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                    contract.risk === 'Low'
+                      ? 'bg-green-500/10 text-green-700 dark:text-green-400'
+                      : contract.risk === 'Medium'
+                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
+                        : 'bg-red-500/10 text-red-700 dark:text-red-400'
+                  }`}
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full ${
+                      contract.risk === 'Low'
+                        ? 'bg-green-500'
+                        : contract.risk === 'Medium'
+                          ? 'bg-amber-500'
+                          : 'bg-red-500'
+                    }`}
+                  ></span>
                   {contract.risk} Risk
                 </div>
-                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                  contract.status === 'Analyzed' ? 'bg-primary/10 text-primary' :
-                  'bg-muted text-muted-foreground'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                    contract.status === 'Analyzed'
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
                   {contract.status}
                 </span>
               </div>
@@ -110,5 +126,5 @@ export default function DashboardPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

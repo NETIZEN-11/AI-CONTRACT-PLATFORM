@@ -2,18 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "commonjs",
+    "moduleResolution": "node",
 
     "lib": ["ES2022"],
 
     "rootDir": "./src",
     "outDir": "./dist",
-
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    },
 
     "strict": true,
 
@@ -32,21 +27,11 @@
     "declaration": true,
     "declarationMap": true,
 
-    "allowJs": false,
     "noEmit": false,
-
-    "incremental": true,
     "removeComments": false
   },
 
   "include": ["src/**/*.ts"],
 
-  "exclude": [
-    "node_modules",
-    "dist",
-    "coverage",
-    "prisma",
-    "**/*.spec.ts",
-    "**/*.test.ts"
-  ]
+  "exclude": ["node_modules", "dist", "coverage", "prisma", "**/*.spec.ts", "**/*.test.ts"]
 }

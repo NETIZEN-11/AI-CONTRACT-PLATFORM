@@ -9,36 +9,111 @@ async function main() {
   // Create permissions
   const permissions = [
     // Contract permissions
-    { name: 'contracts:create', resource: 'contracts', action: 'create', description: 'Create contracts' },
-    { name: 'contracts:read', resource: 'contracts', action: 'read', description: 'Read contracts' },
-    { name: 'contracts:update', resource: 'contracts', action: 'update', description: 'Update contracts' },
-    { name: 'contracts:delete', resource: 'contracts', action: 'delete', description: 'Delete contracts' },
-    { name: 'contracts:export', resource: 'contracts', action: 'export', description: 'Export contracts' },
-    
+    {
+      name: 'contracts:create',
+      resource: 'contracts',
+      action: 'create',
+      description: 'Create contracts',
+    },
+    {
+      name: 'contracts:read',
+      resource: 'contracts',
+      action: 'read',
+      description: 'Read contracts',
+    },
+    {
+      name: 'contracts:update',
+      resource: 'contracts',
+      action: 'update',
+      description: 'Update contracts',
+    },
+    {
+      name: 'contracts:delete',
+      resource: 'contracts',
+      action: 'delete',
+      description: 'Delete contracts',
+    },
+    {
+      name: 'contracts:export',
+      resource: 'contracts',
+      action: 'export',
+      description: 'Export contracts',
+    },
+
     // User permissions
     { name: 'users:create', resource: 'users', action: 'create', description: 'Create users' },
     { name: 'users:read', resource: 'users', action: 'read', description: 'Read users' },
     { name: 'users:update', resource: 'users', action: 'update', description: 'Update users' },
     { name: 'users:delete', resource: 'users', action: 'delete', description: 'Delete users' },
-    
+
     // Review permissions
-    { name: 'reviews:create', resource: 'reviews', action: 'create', description: 'Create reviews' },
+    {
+      name: 'reviews:create',
+      resource: 'reviews',
+      action: 'create',
+      description: 'Create reviews',
+    },
     { name: 'reviews:read', resource: 'reviews', action: 'read', description: 'Read reviews' },
-    { name: 'reviews:update', resource: 'reviews', action: 'update', description: 'Update reviews' },
-    { name: 'reviews:delete', resource: 'reviews', action: 'delete', description: 'Delete reviews' },
-    { name: 'reviews:approve', resource: 'reviews', action: 'approve', description: 'Approve reviews' },
-    
+    {
+      name: 'reviews:update',
+      resource: 'reviews',
+      action: 'update',
+      description: 'Update reviews',
+    },
+    {
+      name: 'reviews:delete',
+      resource: 'reviews',
+      action: 'delete',
+      description: 'Delete reviews',
+    },
+    {
+      name: 'reviews:approve',
+      resource: 'reviews',
+      action: 'approve',
+      description: 'Approve reviews',
+    },
+
     // Analytics permissions
-    { name: 'analytics:read', resource: 'analytics', action: 'read', description: 'View analytics' },
-    { name: 'analytics:export', resource: 'analytics', action: 'export', description: 'Export analytics' },
-    
+    {
+      name: 'analytics:read',
+      resource: 'analytics',
+      action: 'read',
+      description: 'View analytics',
+    },
+    {
+      name: 'analytics:export',
+      resource: 'analytics',
+      action: 'export',
+      description: 'Export analytics',
+    },
+
     // Organization permissions
-    { name: 'organization:manage', resource: 'organization', action: 'manage', description: 'Manage organization' },
-    { name: 'organization:settings', resource: 'organization', action: 'settings', description: 'Manage settings' },
-    
+    {
+      name: 'organization:manage',
+      resource: 'organization',
+      action: 'manage',
+      description: 'Manage organization',
+    },
+    {
+      name: 'organization:settings',
+      resource: 'organization',
+      action: 'settings',
+      description: 'Manage settings',
+    },
+
     // Workflow permissions
-    { name: 'workflows:create', resource: 'workflows', action: 'create', description: 'Create workflows' },
-    { name: 'workflows:manage', resource: 'workflows', action: 'manage', description: 'Manage workflows' },
+    {
+      name: 'workflows:create',
+      resource: 'workflows',
+      action: 'create',
+      description: 'Create workflows',
+    },
+    {
+      name: 'workflows:manage',
+      resource: 'workflows',
+      action: 'manage',
+      description: 'Manage workflows',
+    },
   ];
 
   console.log('📝 Creating permissions...');
@@ -54,50 +129,75 @@ async function main() {
   // Define role-permission mappings
   const rolePermissions: Record<UserRole, string[]> = {
     [UserRole.ADMIN]: [
-      'contracts:create', 'contracts:read', 'contracts:update', 'contracts:delete', 'contracts:export',
-      'users:create', 'users:read', 'users:update', 'users:delete',
-      'reviews:create', 'reviews:read', 'reviews:update', 'reviews:delete', 'reviews:approve',
-      'analytics:read', 'analytics:export',
-      'organization:manage', 'organization:settings',
-      'workflows:create', 'workflows:manage',
+      'contracts:create',
+      'contracts:read',
+      'contracts:update',
+      'contracts:delete',
+      'contracts:export',
+      'users:create',
+      'users:read',
+      'users:update',
+      'users:delete',
+      'reviews:create',
+      'reviews:read',
+      'reviews:update',
+      'reviews:delete',
+      'reviews:approve',
+      'analytics:read',
+      'analytics:export',
+      'organization:manage',
+      'organization:settings',
+      'workflows:create',
+      'workflows:manage',
     ],
     [UserRole.LEGAL_MANAGER]: [
-      'contracts:create', 'contracts:read', 'contracts:update', 'contracts:export',
+      'contracts:create',
+      'contracts:read',
+      'contracts:update',
+      'contracts:export',
       'users:read',
-      'reviews:create', 'reviews:read', 'reviews:update', 'reviews:approve',
-      'analytics:read', 'analytics:export',
-      'workflows:create', 'workflows:manage',
+      'reviews:create',
+      'reviews:read',
+      'reviews:update',
+      'reviews:approve',
+      'analytics:read',
+      'analytics:export',
+      'workflows:create',
+      'workflows:manage',
     ],
     [UserRole.LAWYER]: [
-      'contracts:create', 'contracts:read', 'contracts:update',
+      'contracts:create',
+      'contracts:read',
+      'contracts:update',
       'users:read',
-      'reviews:create', 'reviews:read', 'reviews:update',
+      'reviews:create',
+      'reviews:read',
+      'reviews:update',
       'analytics:read',
     ],
     [UserRole.PROCUREMENT]: [
-      'contracts:create', 'contracts:read',
-      'reviews:read',
-      'analytics:read',
-    ],
-    [UserRole.HR]: [
-      'contracts:create', 'contracts:read',
-      'reviews:read',
-      'analytics:read',
-    ],
-    [UserRole.FINANCE]: [
-      'contracts:create', 'contracts:read',
-      'reviews:read',
-      'analytics:read', 'analytics:export',
-    ],
-    [UserRole.COMPLIANCE_OFFICER]: [
-      'contracts:read', 'contracts:export',
-      'reviews:read', 'reviews:approve',
-      'analytics:read', 'analytics:export',
-    ],
-    [UserRole.EXTERNAL_CLIENT]: [
+      'contracts:create',
       'contracts:read',
       'reviews:read',
+      'analytics:read',
     ],
+    [UserRole.HR]: ['contracts:create', 'contracts:read', 'reviews:read', 'analytics:read'],
+    [UserRole.FINANCE]: [
+      'contracts:create',
+      'contracts:read',
+      'reviews:read',
+      'analytics:read',
+      'analytics:export',
+    ],
+    [UserRole.COMPLIANCE_OFFICER]: [
+      'contracts:read',
+      'contracts:export',
+      'reviews:read',
+      'reviews:approve',
+      'analytics:read',
+      'analytics:export',
+    ],
+    [UserRole.EXTERNAL_CLIENT]: ['contracts:read', 'reviews:read'],
   };
 
   console.log('🔐 Assigning permissions to roles...');
@@ -145,7 +245,7 @@ async function main() {
   // Create demo team
   console.log('👥 Creating demo team...');
   const team = await prisma.team.upsert({
-    where: { 
+    where: {
       organizationId_name: {
         organizationId: organization.id,
         name: 'Legal Team',

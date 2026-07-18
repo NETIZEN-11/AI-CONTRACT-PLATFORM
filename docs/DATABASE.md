@@ -7,12 +7,14 @@ The Contract AI Platform uses PostgreSQL with Prisma ORM. The database is design
 ## Architecture
 
 ### Multi-Tenancy
+
 - Organization-level isolation
 - Team-based grouping within organizations
 - All data queries filtered by `organizationId`
 - Row-level security ready for PostgreSQL RLS
 
 ### Performance Optimization
+
 - Strategic indexing on frequently queried columns
 - Full-text search indexes for contract and clause content
 - Vector embeddings for semantic search (pgvector)
@@ -21,6 +23,7 @@ The Contract AI Platform uses PostgreSQL with Prisma ORM. The database is design
 ## Core Data Models
 
 ### Organization
+
 Top-level entity representing a company/legal firm.
 
 ```prisma
@@ -38,11 +41,13 @@ model Organization {
 ```
 
 **Key Fields**:
+
 - `internalPolicies`: Custom compliance rules in JSON format
 - `timezone`: For scheduling and date handling
 - Relations: Teams, Users, Contracts, Reports
 
 ### User
+
 Represents team members with role-based access control.
 
 ```prisma
@@ -54,7 +59,7 @@ model User {
   organizationId    String
   teamId            String?
   isActive          Boolean    @default(true)
-  
+
   // Authentication
   hashedPassword    String?
   emailVerified     DateTime?
@@ -74,12 +79,14 @@ enum UserRole {
 ```
 
 **Security**:
+
 - Passwords stored as bcrypt hashes
 - Email verification tracking
 - MFA support
 - Last login tracking
 
 ### Team
+
 Organizational subgroups within an organization.
 
 ```prisma
@@ -88,7 +95,7 @@ model Team {
   organizationId    String
   name              String
   description       String?
-  
+
   @@unique([organizationId, name])
 }
 ```
@@ -96,6 +103,7 @@ model Team {
 ## Contract Models
 
 ### Contract
+
 Main contract document entity.
 
 ```prisma
@@ -106,21 +114,21 @@ model Contract {
   title             String
   contractType      ContractType
   status            ContractStatus
-  
+
   // Dates
   effectiveDate     DateTime?
   expirationDate    DateTime?
-  
+
   // Financial
   value             Float?
   currency          String?    @default("USD")
   paymentTerms      String?
-  
+
   // Document Storage
   fileUrl           String?    // S3/Blob URL
   fileKey           String?    // Storage key
   fileSize          Int?
-  
+
   // Extracted Content
   extractedText     String?    // Full text for search
   embedding         Vector?    // OpenAI embeddings for semantic search
@@ -156,6 +164,7 @@ enum ContractType {
 ```
 
 **Key Features**:
+
 - Status tracking through entire lifecycle
 - Expiration date tracking for compliance
 - OCR-extracted text for full-text search
@@ -163,6 +172,7 @@ enum ContractType {
 - Multi-tenancy via organizationId
 
 ### ContractVersion
+
 Version control for contracts.
 
 ```prisma
@@ -174,7 +184,7 @@ model ContractVersion {
   changesSummary    String?
   createdAt         DateTime   @default(now())
   createdBy         String
-  
+
   @@unique([contractId, version])
 }
 ```
@@ -182,6 +192,7 @@ model ContractVersion {
 **Purpose**: Track contract changes over time for audit and comparison.
 
 ### Clause
+
 Individual contract clauses extracted during parsing.
 
 ```prisma
@@ -194,7 +205,7 @@ model Clause {
   content           String
   category          String    // "Parties", "Payment Terms", etc.
   embedding         Vector?
-  
+
   isTemplate        Boolean    @default(false)
   isFavorite        Boolean    @default(false)
   riskLevel         RiskLevel? @default(INFO)
@@ -202,6 +213,7 @@ model Clause {
 ```
 
 **Categories**:
+
 - Parties
 - Effective Date
 - Expiration Date
@@ -220,13 +232,14 @@ model Clause {
 ## AI Analysis Models
 
 ### AIReview
+
 Result of AI analysis on a contract.
 
 ```prisma
 model AIReview {
   id                    String     @id @default(cuid())
   contractId            String
-  
+
   // Analysis Results
   executiveSummary      String?
   legalSummary          String?
@@ -235,13 +248,13 @@ model AIReview {
   riskSummary           String?
   obligationSummary     String?
   timelineSummary       String?
-  
+
   // Extracted Data
   extractedParties      String[]   // JSON array
   extractedEffectiveDate DateTime?
   extractedExpirationDate DateTime?
   extractedPaymentTerms String?
-  
+
   // Metadata
   status                String     @default("PENDING")
   confidence            Float?     // 0-1 score
@@ -252,6 +265,7 @@ model AIReview {
 ```
 
 ### Risk
+
 Identified risks during analysis.
 
 ```prisma
@@ -278,6 +292,7 @@ enum RiskLevel {
 ```
 
 **Risk Types**:
+
 - Missing clauses
 - Conflicting clauses
 - Unlimited liability
@@ -287,22 +302,23 @@ enum RiskLevel {
 - Financial risks
 
 ### RiskReport
+
 Aggregated risk assessment for a contract.
 
 ```prisma
 model RiskReport {
   id                String     @id @default(cuid())
   contractId        String     @unique
-  
+
   totalRisks        Int        @default(0)
   criticalCount     Int        @default(0)
   highCount         Int        @default(0)
   mediumCount       Int        @default(0)
   lowCount          Int        @default(0)
-  
+
   riskScore         Float?     // 0-100
   overallRiskLevel  RiskLevel  @default(MEDIUM)
-  
+
   missingClauses    String[]   // JSON array
   conflictingClauses String[]
   financialRisks    String?
@@ -311,25 +327,26 @@ model RiskReport {
 ```
 
 ### ComplianceReport
+
 Compliance assessment across frameworks.
 
 ```prisma
 model ComplianceReport {
   id                    String     @id @default(cuid())
   contractId            String     @unique
-  
+
   gdprCompliant         ComplianceStatus
   hipaaCompliant        ComplianceStatus
   soc2Compliant         ComplianceStatus
   iso27001Compliant     ComplianceStatus
   pciDssCompliant       ComplianceStatus
   soxCompliant          ComplianceStatus
-  
+
   customPolicies        String?    // JSON with custom policy compliance
-  
+
   complianceScore       Float?     // 0-100
   overallStatus         ComplianceStatus
-  
+
   issues                String?    // JSON array
   recommendations       String?
 }
@@ -344,6 +361,7 @@ enum ComplianceStatus {
 ```
 
 **Frameworks**:
+
 - GDPR (EU data protection)
 - HIPAA (US healthcare)
 - SOC2 (service organization controls)
@@ -355,6 +373,7 @@ enum ComplianceStatus {
 ## Collaboration Models
 
 ### Comment
+
 Team comments and discussions on contracts.
 
 ```prisma
@@ -362,7 +381,7 @@ model Comment {
   id                String     @id @default(cuid())
   contractId        String
   createdBy         String
-  
+
   content           String
   mentions          String[]   // @mentioned user IDs
   resolved          Boolean    @default(false)
@@ -371,6 +390,7 @@ model Comment {
 ```
 
 ### Approval
+
 Approval tracking through workflow.
 
 ```prisma
@@ -378,7 +398,7 @@ model Approval {
   id                String     @id @default(cuid())
   contractId        String
   assignedTo        String
-  
+
   status            ApprovalStatus
   reason            String?
   notes             String?
@@ -395,13 +415,14 @@ enum ApprovalStatus {
 ```
 
 ### Signature
+
 E-signature tracking.
 
 ```prisma
 model Signature {
   id                String     @id @default(cuid())
   contractId        String
-  
+
   signedBy          String     // User name or email
   signatureUrl      String?    // Image URL
   signatureData     String?    // Base64 encoded
@@ -414,6 +435,7 @@ model Signature {
 ## Workflow Models
 
 ### Workflow
+
 Defines approval workflow steps.
 
 ```prisma
@@ -423,7 +445,7 @@ model Workflow {
   name              String
   description       String?
   status            WorkflowStatus
-  
+
   steps             WorkflowStep[]
 }
 
@@ -437,6 +459,7 @@ enum WorkflowStatus {
 ```
 
 ### WorkflowStep
+
 Individual steps in a workflow.
 
 ```prisma
@@ -444,16 +467,17 @@ model WorkflowStep {
   id                String     @id @default(cuid())
   workflowId        String
   order             Int
-  
+
   name              String
   type              String     // "REVIEW", "APPROVAL", "SIGNATURE"
   requiredRole      UserRole?
-  
+
   @@unique([workflowId, order])
 }
 ```
 
 ### WorkflowItem
+
 Active workflow instance for a contract.
 
 ```prisma
@@ -461,10 +485,10 @@ model WorkflowItem {
   id                String     @id @default(cuid())
   workflowId        String
   contractId        String
-  
+
   currentStep       Int        @default(0)
   status            WorkflowStatus
-  
+
   startedAt         DateTime   @default(now())
   completedAt       DateTime?
 }
@@ -473,6 +497,7 @@ model WorkflowItem {
 ## Notification Models
 
 ### Notification
+
 System notifications for users.
 
 ```prisma
@@ -481,16 +506,16 @@ model Notification {
   organizationId    String
   userId            String
   contractId        String?
-  
+
   type              String     // "CONTRACT_APPROVED", "RISK_DETECTED"
   title             String
   message           String
   data              String?    // JSON
-  
+
   channel           NotificationChannel
   status            NotificationStatus
   recipient         String     // Email, Slack ID
-  
+
   isRead            Boolean    @default(false)
   readAt            DateTime?
 }
@@ -515,6 +540,7 @@ enum NotificationStatus {
 ## Audit Logging
 
 ### AuditLog
+
 Complete audit trail of all actions.
 
 ```prisma
@@ -523,15 +549,15 @@ model AuditLog {
   organizationId    String
   userId            String?
   contractId        String?
-  
+
   action            AuditAction
   entityType        String     // "CONTRACT", "USER", "WORKFLOW"
   entityId          String
   changes           String?    // JSON diff
-  
+
   ipAddress         String?
   userAgent         String?
-  
+
   createdAt         DateTime   @default(now())
 }
 
@@ -554,9 +580,11 @@ enum AuditAction {
 ## Indexing Strategy
 
 ### Foreign Key Indexes
+
 All foreign keys automatically indexed for join performance.
 
 ### Search Indexes
+
 ```sql
 -- Full-text search on contract content
 CREATE INDEX idx_contracts_fulltext ON "Contract" USING GIN (
@@ -570,6 +598,7 @@ CREATE INDEX idx_clauses_fulltext ON "Clause" USING GIN (
 ```
 
 ### Status/State Indexes
+
 ```sql
 -- Fast filtering by status
 CREATE INDEX idx_contracts_status ON "Contract"("status");
@@ -578,6 +607,7 @@ CREATE INDEX idx_workflows_status ON "WorkflowItem"("status");
 ```
 
 ### Date Range Indexes
+
 ```sql
 -- Efficient expiration tracking
 CREATE INDEX idx_contracts_expiration ON "Contract"("expirationDate");
@@ -585,6 +615,7 @@ CREATE INDEX idx_contracts_created ON "Contract"("createdAt");
 ```
 
 ### Multi-column Indexes
+
 ```sql
 -- Organization + Team filtering
 CREATE INDEX idx_contracts_org_team ON "Contract"("organizationId", "teamId");
@@ -592,6 +623,7 @@ CREATE INDEX idx_users_org_team ON "User"("organizationId", "teamId");
 ```
 
 ### Vector Indexes
+
 ```sql
 -- Vector similarity search for embeddings
 CREATE INDEX idx_contracts_embedding ON "Contract" USING ivfflat (embedding vector_cosine_ops);
@@ -601,22 +633,26 @@ CREATE INDEX idx_clauses_embedding ON "Clause" USING ivfflat (embedding vector_c
 ## Database Setup
 
 ### Create Migration
+
 ```bash
 cd packages/database
 pnpm prisma migrate dev --name initial_schema
 ```
 
 ### Reset Database
+
 ```bash
 pnpm prisma migrate reset
 ```
 
 ### Seed Sample Data
+
 ```bash
 pnpm seed
 ```
 
 ### View Schema
+
 ```bash
 pnpm db:studio
 ```
@@ -638,14 +674,16 @@ CREATE POLICY user_organization_isolation ON "User"
 ## Query Patterns
 
 ### Get all contracts for organization
+
 ```typescript
 const contracts = await prisma.contract.findMany({
   where: { organizationId },
-  include: { versions: true, clauses: true }
+  include: { versions: true, clauses: true },
 });
 ```
 
 ### Get contract with full analysis
+
 ```typescript
 const contract = await prisma.contract.findUnique({
   where: { id },
@@ -657,12 +695,13 @@ const contract = await prisma.contract.findUnique({
     complianceReport: true,
     comments: { include: { creator: true } },
     approvals: { include: { user: true } },
-    signatures: true
-  }
+    signatures: true,
+  },
 });
 ```
 
 ### Search contracts by text
+
 ```typescript
 const contracts = await prisma.$queryRaw`
   SELECT * FROM "Contract"
@@ -675,15 +714,16 @@ const contracts = await prisma.$queryRaw`
 ```
 
 ### Get expiring contracts
+
 ```typescript
 const expiringContracts = await prisma.contract.findMany({
   where: {
     organizationId,
     expirationDate: {
       lte: addDays(new Date(), 30),
-      gte: new Date()
-    }
-  }
+      gte: new Date(),
+    },
+  },
 });
 ```
 
@@ -699,11 +739,13 @@ const expiringContracts = await prisma.contract.findMany({
 ## Backup & Recovery
 
 ### Daily Backup
+
 ```bash
 pg_dump $DATABASE_URL > backups/contract_ai_$(date +%Y%m%d).sql
 ```
 
 ### Restore from Backup
+
 ```bash
 psql $DATABASE_URL < backups/contract_ai_20240715.sql
 ```
@@ -711,11 +753,13 @@ psql $DATABASE_URL < backups/contract_ai_20240715.sql
 ## Monitoring
 
 ### Database Size
+
 ```sql
 SELECT pg_size_pretty(pg_database_size('contract_ai'));
 ```
 
 ### Table Sizes
+
 ```sql
 SELECT schemaname, tablename, pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename))
 FROM pg_tables
@@ -724,6 +768,7 @@ ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 ```
 
 ### Index Usage
+
 ```sql
 SELECT schemaname, tablename, indexname, idx_scan
 FROM pg_stat_user_indexes

@@ -50,7 +50,7 @@ export class StorageService {
   async uploadFile(
     file: Express.Multer.File,
     organizationId: string,
-    folder: string = 'contracts',
+    folder: string = 'contracts'
   ): Promise<UploadResult> {
     try {
       // Generate unique key

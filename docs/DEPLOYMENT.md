@@ -15,17 +15,20 @@ This guide covers deploying the Contract AI Platform to production environments.
 ## Deployment Environments
 
 ### Development
+
 - Local Docker Compose
 - All services in single environment
 - Shared test database
 
 ### Staging
+
 - Kubernetes cluster (1-2 nodes)
 - Cloud-managed PostgreSQL and Redis
 - Same code as production
 - For testing before release
 
 ### Production
+
 - Kubernetes cluster (3+ nodes, multi-zone)
 - High-availability setup
 - Auto-scaling enabled
@@ -110,6 +113,7 @@ kubectl get pods -n contract-ai
 ### Example Kubernetes Manifests
 
 **API Deployment:**
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -127,40 +131,40 @@ spec:
         app: contract-ai-api
     spec:
       containers:
-      - name: api
-        image: your-registry/contract-ai-api:latest
-        ports:
-        - containerPort: 3001
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: DATABASE_URL
-        - name: NODE_ENV
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: NODE_ENV
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 10
-          periodSeconds: 5
+        - name: api
+          image: your-registry/contract-ai-api:latest
+          ports:
+            - containerPort: 3001
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: DATABASE_URL
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: NODE_ENV
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '250m'
+            limits:
+              memory: '1Gi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3001
+            initialDelaySeconds: 10
+            periodSeconds: 5
 ---
 apiVersion: v1
 kind: Service
@@ -171,13 +175,14 @@ spec:
   selector:
     app: contract-ai-api
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 3001
+    - protocol: TCP
+      port: 80
+      targetPort: 3001
   type: ClusterIP
 ```
 
 **Horizontal Pod Autoscaler:**
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -192,18 +197,18 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 ## Database Migrations
@@ -263,12 +268,12 @@ spec:
     name: app-secrets
     creationPolicy: Owner
   data:
-  - secretKey: DATABASE_URL
-    remoteRef:
-      key: contract-ai/database-url
-  - secretKey: REDIS_URL
-    remoteRef:
-      key: contract-ai/redis-url
+    - secretKey: DATABASE_URL
+      remoteRef:
+        key: contract-ai/database-url
+    - secretKey: REDIS_URL
+      remoteRef:
+        key: contract-ai/redis-url
 ```
 
 ## Monitoring & Logging
@@ -345,10 +350,10 @@ spec:
     interval: 1m
     threshold: 10
     metrics:
-    - name: request-success-rate
-      thresholdRange:
-        min: 99
-      interval: 1m
+      - name: request-success-rate
+        thresholdRange:
+          min: 99
+        interval: 1m
   deployment:
     progressDeadlineSeconds: 60
   skipAnalysis: false
@@ -359,11 +364,13 @@ spec:
 ## Health Checks
 
 ### Readiness Probe
+
 ```bash
 curl -f http://localhost:3001/health/ready || exit 1
 ```
 
 ### Liveness Probe
+
 ```bash
 curl -f http://localhost:3001/health/live || exit 1
 ```
@@ -371,6 +378,7 @@ curl -f http://localhost:3001/health/live || exit 1
 ## Scaling
 
 ### Manual Scaling
+
 ```bash
 # Scale API to 5 replicas
 kubectl scale deployment contract-ai-api --replicas=5 -n contract-ai
@@ -380,6 +388,7 @@ kubectl get deployment contract-ai-api -n contract-ai
 ```
 
 ### Automatic Scaling
+
 Already configured in HPA manifest above.
 
 ## Disaster Recovery
@@ -425,11 +434,13 @@ kubectl rollout undo deployment/contract-ai-api --to-revision=2 -n contract-ai
 ## Performance Tuning
 
 ### Pod Resource Limits
+
 - API: 512Mi RAM, 250m CPU minimum; 1Gi RAM, 500m CPU maximum
 - Web: 256Mi RAM, 100m CPU minimum; 512Mi RAM, 250m CPU maximum
 - AI Service: 2Gi RAM, 500m CPU minimum; 4Gi RAM, 2000m CPU maximum
 
 ### Database Connection Pooling
+
 ```
 PgBouncer config:
 pool_mode = transaction
@@ -469,18 +480,21 @@ curl https://your-domain.com/health
 ## Troubleshooting
 
 ### Pod not starting
+
 ```bash
 kubectl describe pod <pod-name> -n contract-ai
 kubectl logs <pod-name> -n contract-ai
 ```
 
 ### Service unreachable
+
 ```bash
 kubectl get svc -n contract-ai
 kubectl get endpoints -n contract-ai
 ```
 
 ### Database connection issues
+
 ```bash
 kubectl exec -it <pod-name> -n contract-ai -- \
   psql $DATABASE_URL -c "SELECT 1"
@@ -489,6 +503,7 @@ kubectl exec -it <pod-name> -n contract-ai -- \
 ## CI/CD Integration
 
 GitHub Actions workflow triggers deployment:
+
 ```yaml
 - name: Deploy to Kubernetes
   run: |
@@ -501,6 +516,7 @@ GitHub Actions workflow triggers deployment:
 ## Maintenance Windows
 
 Schedule maintenance during off-peak hours:
+
 ```bash
 # Drain node for maintenance
 kubectl drain node-name --ignore-daemonsets

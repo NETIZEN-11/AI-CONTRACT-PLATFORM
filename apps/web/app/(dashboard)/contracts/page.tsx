@@ -57,7 +57,10 @@ export default function ContractsPage() {
           </div>
         ) : (
           contracts.map((contract) => (
-            <div key={contract.id} className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow">
+            <div
+              key={contract.id}
+              className="bg-card border border-border rounded-lg p-6 hover:shadow-md transition-shadow"
+            >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -71,7 +74,9 @@ export default function ContractsPage() {
                     <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        {contract.effectiveDate ? new Date(contract.effectiveDate).toLocaleDateString() : 'N/A'}
+                        {contract.effectiveDate
+                          ? new Date(contract.effectiveDate).toLocaleDateString()
+                          : 'N/A'}
                       </span>
                       {contract.value && (
                         <span className="flex items-center gap-1">
@@ -79,11 +84,15 @@ export default function ContractsPage() {
                           {contract.value.toLocaleString()} {contract.currency}
                         </span>
                       )}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        contract.status === 'active' ? 'bg-green-100 text-green-700' :
-                        contract.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          contract.status === 'active'
+                            ? 'bg-green-100 text-green-700'
+                            : contract.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
                         {contract.status}
                       </span>
                     </div>

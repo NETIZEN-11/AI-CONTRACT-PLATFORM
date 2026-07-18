@@ -24,8 +24,10 @@ interface AuthState {
 
 export const useAuth = create<AuthState>((set, get) => {
   // Initialize from localStorage
-  const savedAccessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-  const savedRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+  const savedAccessToken =
+    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  const savedRefreshToken =
+    typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
   const savedUser = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
 
   if (savedAccessToken) {
@@ -43,14 +45,14 @@ export const useAuth = create<AuthState>((set, get) => {
       set({ isLoading: true });
       try {
         const response: AuthResponse = await api.login(email, password);
-        
+
         // Save to localStorage
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.user));
-        
+
         api.setToken(response.accessToken);
-        
+
         set({
           user: response.user,
           accessToken: response.accessToken,
@@ -68,13 +70,13 @@ export const useAuth = create<AuthState>((set, get) => {
       set({ isLoading: true });
       try {
         const response: AuthResponse = await api.register(data);
-        
+
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.user));
-        
+
         api.setToken(response.accessToken);
-        
+
         set({
           user: response.user,
           accessToken: response.accessToken,
@@ -93,7 +95,7 @@ export const useAuth = create<AuthState>((set, get) => {
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       api.clearToken();
-      
+
       set({
         user: null,
         accessToken: null,
@@ -109,16 +111,16 @@ export const useAuth = create<AuthState>((set, get) => {
         get().logout();
         return;
       }
-      
+
       try {
         const response: AuthResponse = await api.refreshToken(refreshToken);
-        
+
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.user));
-        
+
         api.setToken(response.accessToken);
-        
+
         set({
           user: response.user,
           accessToken: response.accessToken,
